@@ -3,6 +3,10 @@ from extract_datatables_table import extract_datables_table
 from extract_html_table import extract_html_table
 from get_pages import get_pages
 
+# testing url
+# url = "http://127.0.0.1:4000/web-scraping-dat-v-pythonu/"
+
+# online url
 url = "https://jancaha.github.io/web-scraping-dat-v-pythonu/"
 
 pages = get_pages(url)
