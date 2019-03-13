@@ -28,6 +28,12 @@ def is_next_page_available(browser, table_id):
 def extract_datables_table(url):
 
     path_to_chromedriver = "./chromedriver_win32/chromedriver.exe"
+
+    '''
+    # Linux path (if the chromium-chromedriver lib is installed)
+    path_to_chromedriver = "/usr/bin/chromedriver"
+    '''
+
     browser = webdriver.Chrome(executable_path=path_to_chromedriver)
 
     browser.get(url)
