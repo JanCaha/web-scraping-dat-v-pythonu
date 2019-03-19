@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 import re
 
+
 def next_page_url(soup):
 
     next = soup.find("ul", {"class": ["main-pager", "pager"]}).find("li", {"class": "next"})
@@ -24,6 +25,7 @@ def is_next_page(soup):
         return True
     else:
         return False
+
 
 def load_url_soup(url):
 
