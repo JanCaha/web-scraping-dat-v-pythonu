@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Web scraping dat v Pythonu</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+	
+	<link rel="stylesheet" href="css\robot-edits.css" type="text/css" />
+    <link rel="stylesheet" href="css\robot-fonts-edits.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Web scraping dat v Pythonu
+
+## Jan Caha
+
+### Seminář - GIS Ostrava 2019
+
+---
+
+# Proč Python?
+
+- rychlost vývoje
+
+- jednoduchost
+
+- možnost pracovat mimo jiné i interaktivně 
+
+- množství knihoven a nástrojů
+
+---
+
+# Python verze a management knihoven
+
+- 2.7.x `\( \times \)` .highlight[**3.x**]
+
+  - updaty samotného jazyka
+  
+  - knihovny a nové verze
+
+- [Anaconda](https://www.anaconda.com/distribution/)
+  
+  - ujednocenější prostředí
+  
+  - konflikty v updatech dílčích částí
+  
+  - zdroje (i mimo pip, např. conda-forge)
+  
+  - IDE nativně podporují
+  
+---
+
+# IDE pro Python
+
+- [PyCharm](https://www.jetbrains.com/pycharm/)
+
+- verze Community
+
+- jak pro Windows, macOS tak i Linux
+
+---
+
+# Web scraping
+
+- extrakce dat z webových stránek
+
+- různé úrovně složitosti (nadpisy `\( \times \)` všechny tabulky se třemi sloupci)
+
+- lze provádět ve většině programovacích jazyků
+
+- dva základní tipy HTML stránek, dle toho se chová DOM (Document Object Model)
+  
+  - pevný - po načtení HTML se už zásadně nemění (stačí číst HTML)
+  
+  - interaktivní - DOM se výrazně mění většinou pomocí JavaScriptu (HTML je třeba získávat až po modifikaci JavaScriptem)  
+
+---
+
+# Knihovny Pythonu k web scrapingu
+
+```python
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import requests
+```
+
+- `requests` - práce s požadavky HTTP
+
+- `bs4` - zpracování a extrakce dat z HTML a XML
+
+- `selenium` - webdriver pro ovládání prohlížečů skrze zdrojový kód (ovladače pro prohlížeče je nutné mít zvlášť)
+
+``` bash
+pip install bs4 selenium requests
+```
+
+- mimo to ještě existuje knihovny `scrapy`, což je univerzální knihovna pro webscraping ale i crawling (aktivně ji nepoužívám)
+  
+  - poskytují i službu na hosting crawlerů
+
+---
+
+# Modelový příklad pro praktické ukázky
+
+- na webu https://jancaha.github.io/web-scraping-dat-v-pythonu/
+
+- stránky s údaji o populaci ve státech světa, za různé roky (zdroj dat https://www.gapminder.org/data/)
+
+- jednoduchý web postavený na [Jekyll](https://jekyllrb.com/) a šabloně [Beautiful Jekyll](https://deanattali.com/beautiful-jekyll/)
+
+- **cíl: extrakce dat o populaci pro jednotlivé státy za dané roky do jedné výsledné tabulky pro další zpracování**
+
+  - dva dílčí kroky: ziskání adres všech stránek s jednotlivými tabulkami a jejich následná extrakce, podle typu tabulky
+
+- ukázka webu
+  
+---
+
+# Studium HTML kódu zdrojových dat
+
+- Vývojářské nástroje (Developer tools) 
+
+- Google Chrome (Chromium) i Mozilla Firefox pod klávesovou zkratkou **F12**
+
+- možnost vyhledávat a zvýrazňovat elementy stránky 
+
+- studium struktury kódu webu je klíčové
+
+- ukázka vývojářských nástrojů
+
+- rozdíl mezi vývojářskými nástroji a klasickým zobrazením HTML
+
+---
+
+# Běh webscraperu
+
+- řízen souborem `run.py`
+
+- pro ukládání dat se používají dataframes z knihovny `pandas` (zejména kvůli snadnému exportu do csv)
+
+- duležitý je i typ stránky (uložen v položce Tag příspěvku)
+
+---
+
+# Získání seznamu všech stránek s daty
+
+- soubor - `get_pages.py`
+
+- klíčové kroky:
+  
+  - získání všech odkazů (a dašlích informací) na další stránky z aktuální stránky
+
+  - zjištění jestli existuje další stránka
+
+  - přesun na další stránku  
+
+---
+
+# Extrakce dat z jednotlivých stránek
+
+- dva typy stránek 
+
+  - statická HTML tabulka (`extract_html_table.py`)
+  
+  - interaktivní HTML tabulka s DataTables (`extract_datatables_table.py`)
+  
+- zjištěno při sběru odkazů, podle typu volíme druh zpracování
+  
+---
+
+# Jednoduchá HTML tabulka
+
+- `extract_html_table.py`
+
+- načtení stránky
+
+- získání roku z nadpisu
+
+- získání tabulky
+
+- pro každý řádek tabulky extrakce dat
+
+---
+
+# Interaktivní HTML tabulka 
+
+- `extract_datatables_table.py`
+
+- aby tabulka existovala, je nutné načtení a vykonání JavaScriptu na stránce (ukázka)
+
+- mimo možnosti `requests` a `bs4`
+
+- nutné použít `selenium` a spustit prohlížeč
+
+- skrze kód v pythonu ovládáme prohlížeč, získáváme aktuální HTML a to pak zpracováváme
+
+---
+
+# Interaktivní HTML tabulka 
+
+- otevření stránky
+
+- získání roku z nadpisu
+
+- najdeme tabulku a v ní tlačítko na přechod na další část tabulky
+
+- pokud existuje další část tabulky, tak z ní načteme řádky a posuneme se na další stránku
+
+---
+
+# Běh webscraperu
+
+- z dat z jednotlivých stránek složíme výsledný datový rámec a exportujeme ho jako csv
+
+---
+
+# Problematika webscrapingu
+
+- legálnost ??? 
+
+- vždy ověřit existenci API pro získání dat (jednodušší, rychlejší a méně nákladné)
+
+- zkusit o data požádat
+
+- scrapovat s rozumem 
+  
+  - zajistit časové odstupy mezi požadavky (uspání procesu)
+  
+  - uložit si část dat na disk a testovat scrapovací postupy na těchto datech (po odladění pustit na celek)
+  
+  - neopakovat příliš často
+
+---
+
+# Další praktické postřehy
+
+- knihovna `requests` umí posílat i hlavičky a cookies, někdy je to nezbytné aby bylo možné získat validní odpověď serveru 
+
+- pomocí `selenia` lze vyřešit např. i přihlašování viz např. [tento tutorial](https://crossbrowsertesting.com/blog/test-automation/automate-login-with-selenium/)
+
+- občas lze při prostudování HTML a JavaScriptu webu najít i původní data, která se pak prezentují na webu (např. ve formátu JSON), tím lze omezit složitost scrapování
+
+- data lze z webových stránek získat vždy, otázka je komplikovanost
+
+---
+
+# Prezentace dat
+
+- vždy přemýšlet nad tím, jestli kromě prezentace dat neposkytnout u "surová" data
+
+- pokud o data někdo opravdu stojí, tak je stejně získá, snaha toto komplikovat je v podstatě zabitý čas
+
+- jediný způsob jak bezpečně uchránit data, je vůbec je neprezentovat! 
+
+---
+
+class: inverse, center, middle
+
+# Děkuji za pozornost!
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML&delayStartupUntil=configured" type="text/javascript"></script>
+    <script>
+      var slideshow = remark.create({ratio: '16:9'});
+	  
+	  // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+          }
+      });
+
+      MathJax.Hub.Configured();
+    </script>
+  </body>
+</html>
